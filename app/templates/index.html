@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">📚 Gestion Scolaire</h1>
+
+        <!-- Boutons pour ouvrir les modals -->
+        <div class="text-center mb-4">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addStudentModal">Ajouter Étudiant</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTeacherModal">Ajouter Professeur</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCourseModal">Ajouter Cours</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassroomModal">Ajouter Classe</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addScheduleModal">Ajouter Emploi du Temps</button>
+        </div>
+
+        <!-- Modal pour Ajouter un Étudiant -->
+        <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addStudentModalLabel">Ajouter un Étudiant</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addStudentForm">
+                            <input type="text" id="studentName" name="name" placeholder="Nom" required>
+                            <input type="number" id="studentAge" name="age" placeholder="Âge" required>
+                            <input type="text" id="studentGrade" name="grade" placeholder="Grade" required>
+                            <button type="submit" class="btn btn-primary">Ajouter</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour Modifier un Étudiant -->
+        <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editStudentModalLabel">Modifier un Étudiant</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editStudentForm">
+                            <input type="hidden" id="editStudentId">
+                            <input type="text" id="editStudentName" placeholder="Nom" required>
+                            <input type="number" id="editStudentAge" placeholder="Âge" required>
+                            <input type="text" id="editStudentGrade" placeholder="Grade" required>
+                            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Répétez les modals pour les professeurs, cours, classes, et emplois du temps -->
+
+        <!-- Modal pour Ajouter un Professeur -->
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTeacherModalLabel">Ajouter un Professeur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTeacherForm">
+                    <input type="text" id="teacherName" name="name" placeholder="Nom" required>
+                    <input type="text" id="teacherSubject" name="subject" placeholder="Matière" required>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Modifier un Professeur -->
+<div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTeacherModalLabel">Modifier un Professeur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTeacherForm">
+                    <input type="hidden" id="editTeacherId">
+                    <input type="text" id="editTeacherName" placeholder="Nom" required>
+                    <input type="text" id="editTeacherSubject" placeholder="Matière" required>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal pour Ajouter un Cours -->
+<div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCourseModalLabel">Ajouter un Cours</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCourseForm">
+                    <input type="text" id="courseName" name="name" placeholder="Nom du cours" required>
+                    <input type="text" id="courseDescription" name="description" placeholder="Description" required>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Modifier un Cours -->
+<div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCourseModalLabel">Modifier un Cours</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCourseForm">
+                    <input type="hidden" id="editCourseId">
+                    <input type="text" id="editCourseName" placeholder="Nom du cours" required>
+                    <input type="text" id="editCourseDescription" placeholder="Description" required>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal pour Ajouter une Classe -->
+<div class="modal fade" id="addClassroomModal" tabindex="-1" aria-labelledby="addClassroomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addClassroomModalLabel">Ajouter une Classe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addClassroomForm">
+                    <input type="text" id="classroomName" name="name" placeholder="Nom de la classe" required>
+                    <input type="number" id="classroomCapacity" name="capacity" placeholder="Capacité" required>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Modifier une Classe -->
+<div class="modal fade" id="editClassroomModal" tabindex="-1" aria-labelledby="editClassroomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClassroomModalLabel">Modifier une Classe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editClassroomForm">
+                    <input type="hidden" id="editClassroomId">
+                    <input type="text" id="editClassroomName" name="name" placeholder="Nom de la classe" required>
+                    <input type="number" id="editClassroomCapacity" name="Capacity" placeholder="Capacité" required>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal pour Ajouter un Emploi du Temps -->
+<div class="modal fade" id="addScheduleModal" tabindex="-1" aria-labelledby="addScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addScheduleModalLabel">Ajouter un Emploi du Temps</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addScheduleForm">
+                    <input type="number" id="scheduleCourseId" name="course_id" placeholder="ID du cours" required>
+                    <input type="number" id="scheduleTeacherId" name="teacher_id" placeholder="ID du professeur" required>
+                    <input type="number" id="scheduleClassroomId" name="classroom_id" placeholder="ID de la classe" required>
+                    <input type="text" id="scheduleTime" name="time" placeholder="Heure (HH:MM)" required>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Modifier un Emploi du Temps -->
+<div class="modal fade" id="editScheduleModal" tabindex="-1" aria-labelledby="editScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editScheduleModalLabel">Modifier un Emploi du Temps</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editScheduleForm">
+                    <input type="hidden" id="editScheduleId">
+                    <input type="number" id="editScheduleCourseId" name="course_id"  placeholder="ID du cours" required>
+                    <input type="number" id="editScheduleTeacherId" name="teacher_id"  placeholder="ID du professeur" required>
+                    <input type="number" id="editScheduleClassroomId" name="classroom_id" placeholder="ID de la classe" required>
+                    <input type="text" id="editScheduleTime" name="time" placeholder="Heure (HH:MM)" required>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    
+
+    <script>
+        // Fonction pour ouvrir le modal de modification avec les données actuelles
+        function openEditModal(type, id, name, age, grade) {
+            if (type === 'student') {
+                document.getElementById('editStudentId').value = id;
+                document.getElementById('editStudentName').value = name;
+                document.getElementById('editStudentAge').value = age;
+                document.getElementById('editStudentGrade').value = grade;
+                new bootstrap.Modal(document.getElementById('editStudentModal')).show();
+            }
+            // Répétez pour les autres types (professeur, cours, etc.)
+        }
+
+        // Fonction pour soumettre le formulaire d'ajout
+        document.getElementById('addStudentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const data = {
+                name: document.getElementById('studentName').value,
+                age: document.getElementById('studentAge').value,
+                grade: document.getElementById('studentGrade').value
+            };
+            fetch('/students', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+              .then(data => {
+                  console.log('Success:', data);
+                  location.reload(); // Recharger la page pour afficher les nouvelles données
+              });
+        });
+
+        // Fonction pour soumettre le formulaire de modification
+        document.getElementById('editStudentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const data = {
+                name: document.getElementById('editStudentName').value,
+                age: document.getElementById('editStudentAge').value,
+                grade: document.getElementById('editStudentGrade').value
+            };
+            const studentId = document.getElementById('editStudentId').value;
+            fetch(`/students/${studentId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                  location.reload(); // Recharger la page pour afficher les nouvelles données
+            });
+        });
+
+        // Répétez les fonctions pour les autres types (professeur, cours, etc.)
+    </script>
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">🎓 Étudiants</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Âge</th>
+                        <th>Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Tableau pour les professeurs -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">👨‍🏫 Professeurs</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Matière</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="teacherTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Tableau pour les cours -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">📖 Cours</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="courseTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Tableau pour les classes -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-white">🏫 Classes</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Capacité</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="classroomTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Tableau pour les emplois du temps -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">⏳ Emplois du Temps</div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Cours</th>
+                        <th>Professeur</th>
+                        <th>Classe</th>
+                        <th>Heure</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+</body>
+<script>
+    // Fonction pour ouvrir le modal de modification avec les données actuelles
+function openEditModal(type, id, ...fields) {
+    if (type === 'teacher') {
+        document.getElementById('editTeacherId').value = id;
+        document.getElementById('editTeacherName').value = fields[0];
+        document.getElementById('editTeacherSubject').value = fields[1];
+        new bootstrap.Modal(document.getElementById('editTeacherModal')).show();
+    } else if (type === 'course') {
+        document.getElementById('editCourseId').value = id;
+        document.getElementById('editCourseName').value = fields[0];
+        document.getElementById('editCourseDescription').value = fields[1];
+        new bootstrap.Modal(document.getElementById('editCourseModal')).show();
+    } else if (type === 'classroom') {
+        document.getElementById('editClassroomId').value = id;
+        document.getElementById('editClassroomName').value = fields[0];
+        document.getElementById('editClassroomCapacity').value = fields[1];
+        new bootstrap.Modal(document.getElementById('editClassroomModal')).show();
+    } else if (type === 'schedule') {
+        document.getElementById('editScheduleId').value = id;
+        document.getElementById('editScheduleCourseId').value = fields[0];
+        document.getElementById('editScheduleTeacherId').value = fields[1];
+        document.getElementById('editScheduleClassroomId').value = fields[2];
+        document.getElementById('editScheduleTime').value = fields[3];
+        new bootstrap.Modal(document.getElementById('editScheduleModal')).show();
+    }
+}
+
+// Gestionnaires d'événements pour les formulaires d'ajout
+document.getElementById('addTeacherForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const data = {
+        name: document.getElementById('teacherName').value,
+        subject: document.getElementById('teacherSubject').value
+    };
+    fetch('/teachers', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(data => {
+          console.log('Success:', data);
+          location.reload();
+      });
+});
+
+// Répétez pour les autres formulaires d'ajout (cours, classe, emploi du temps)
+
+// Gestionnaires d'événements pour les formulaires de modification
+document.getElementById('editTeacherForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const data = {
+        name: document.getElementById('editTeacherName').value,
+        subject: document.getElementById('editTeacherSubject').value
+    };
+    const teacherId = document.getElementById('editTeacherId').value;
+    fetch(`/teachers/${teacherId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(data => {
+          console.log('Success:', data);
+          location.reload();
+      });
+});
+
+// Répétez pour les autres formulaires de modification (cours, classe, emploi du temps)
+
+// Fonction pour remplir un tableau avec des données
+function fillTable(endpoint, tableId, columns, actions = true) {
+    fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = ''; // Effacer le contenu précédent
+            data.forEach(item => {
+                let row = `<tr>`;
+                columns.forEach(column => {
+                    row += `<td>${item[column]}</td>`;
+                });
+                if (actions) {
+                    row += `
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editItem('${endpoint}', ${item.id})">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteItem('${endpoint}', ${item.id})">Supprimer</button>
+                        </td>
+                    `;
+                }
+                row += `</tr>`;
+                tableBody.innerHTML += row;
+            });
+        })
+        .catch(error => console.error('Erreur:', error));
+}
+
+// Fonction pour éditer un élément
+function editItem(endpoint, id) {
+    alert(`Modifier l'élément avec l'ID ${id} (${endpoint})`);
+    // Ouvrir un modal ou rediriger vers une page de modification
+}
+
+// Fonction pour supprimer un élément
+function deleteItem(endpoint, id) {
+    if (confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+        fetch(`${endpoint}/${id}`, { method: 'DELETE' })
+            .then(() => fetchData()); // Recharger les données
+    }
+}
+
+// Charger les données au démarrage
+function fetchData() {
+    fillTable('/students', 'studentTable', ['name', 'age', 'grade']);
+    fillTable('/teachers', 'teacherTable', ['name', 'subject']);
+    fillTable('/courses', 'courseTable', ['name', 'description']);
+    fillTable('/classrooms', 'classroomTable', ['name', 'capacity']);
+    fillTable('/schedules', 'scheduleTable', ['course_id', 'teacher_id', 'classroom_id', 'time']);
+}
+
+document.addEventListener("DOMContentLoaded", fetchData);
+</script>
+</html>
