@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Déclenche la pipeline pour chaque push vers la branche 'main'
+  pull_request:
+    branches:
+      - main  # Déclenche la pipeline pour chaque pull request vers 'main'
+
+jobs:
+  # Job de build et tests
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      # Service PostgreSQL
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: passer
+          POSTGRES_DB: gestion_ecole
+        ports:
+          - 5433:5432  # PostgreSQL exposé sur le port 5433
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      # 1. Checkout du code source
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 2. Installer Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 3. Construire et tester l'application Flask avec Docker Compose
+      - name: Build and test the Flask app with Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+          # Si tu as des tests à exécuter, tu peux les lancer ici (par exemple avec pytest)
+          docker-compose down
+
+      # 4. Construire l'image Docker
+      - name: Build Docker image
+        run: |
+          docker-compose -f docker-compose.yml build
+
+  # Job de déploiement (si tu as un serveur distant)
+  deploy:
+    needs: build  # Le job 'deploy' dépend du job 'build' pour s'exécuter
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout du code source
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 2. Déployer sur un serveur distant (par exemple via SSH)
+      - name: Deploy application
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+        run: |
+          # Installer SSH
+          sudo apt-get install -y openssh-client
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST <<EOF
+            cd /path/to/your/project
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+          EOF

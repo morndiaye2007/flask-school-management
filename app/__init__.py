@@ -12,6 +12,13 @@ def create_app():
     # Créer l'application Flask
     app = Flask(__name__)
 
+
+# Importer les modèles ici
+    from app.models import Student
+
+# Rendre db et Student accessibles depuis `app`
+    __all__ = ["db", "Student"]
+
     # Configuration de la base de données PostgreSQL
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:passer@localhost:5433/gestion_ecole'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Désactive le suivi des modifications

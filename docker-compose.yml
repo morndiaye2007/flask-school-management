@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build: .
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=development
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:passer@localhost:5432/gestion_ecole
+    ports:
+      - "5000:5000"  # Expose le port 5000 pour accéder à l'application
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: passer
+      POSTGRES_DB: gestion_ecole
+    ports:
+      - "5433:5432"  # Expose le port 5433 de PostgreSQL sur le port 5432 dans le conteneur
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  pg_data:
