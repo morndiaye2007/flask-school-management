@@ -12,18 +12,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v1
-      with:
-        version: 'latest'
-
-    - name: Install Helm
-      uses: azure/setup-helm@v1
-      with:
-        version: 'latest'
-
-    - name: Deploy with Helm
+    - name: Install Docker
       run: |
-        helm upgrade --install my-flask-app ./helm \
-          --set flask.image.tag=${{ github.sha }} \
-          --kubeconfig=${{ secrets.KUBE_CONFIG }}
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
+
+    - name: Build and start containers
+      run: |
+        docker-compose -f docker-compose.yml up -d --build
+
+    - name: Run tests
+      run: |
+        docker-compose exec flask-app pytest tests/
+
+    - name: Stop containers
+      run: |
+        docker-compose down
