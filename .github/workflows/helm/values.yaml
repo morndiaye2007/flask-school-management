@@ -1,0 +1,14 @@
+flask:
+  image:
+    repository: votre-nom-d-image-docker
+    tag: latest
+  env:
+    DATABASE_URL: "postgresql://postgres:passer@localhost:5433/gestion_ecole"
+
+postgres:
+  enabled: true
+  postgresqlUsername: myuser
+  postgresqlPassword: mypassword
+  postgresqlDatabase: mydatabase
+  persistence:
+    size: 5Gi

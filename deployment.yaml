@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ma_base_de_donnees
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+
+  flask-app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/ma_base_de_donnees
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    networks:
+      - mynetwork
+
+volumes:
+  postgres_data:
+
+networks:
+  mynetwork:

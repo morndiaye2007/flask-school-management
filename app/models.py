@@ -1,7 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-# Initialisation de SQLAlchemy
-db = SQLAlchemy()
+from . import db
 
 class Student(db.Model):
     __tablename__ = 'students'
