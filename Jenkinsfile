@@ -24,6 +24,20 @@ pipeline {
             }
         }
 
+        stage('Start Flask Application') {
+            steps {
+                bat '''
+                set FLASK_APP=run.py
+                set FLASK_ENV=production
+                set DATABASE_URL=postgresql://postgres:passer@localhost:5433/gestion_ecole
+
+                REM Démarrer l'application en arrière-plan
+                start /B C:\\laragon\\bin\\python\\python-3.10\\python.exe -m flask run --host=0.0.0.0 --port=5000
+            '''
+        // Attendre quelques secondes pour que l'application démarre
+        sleep(time: 10, unit: 'SECONDS')
+    }
+        }
         
         stage('Run Tests') {
             steps {
