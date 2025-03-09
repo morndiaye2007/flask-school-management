@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        /*
+        
         stage('Run Tests') {
             steps {
                 // Exécuter les tests avec pytest
@@ -37,7 +37,7 @@ pipeline {
                 }
             }
         }
-        */
+        
 
         stage('Deploy') {
             steps {
