@@ -13,53 +13,57 @@ pipeline {
             steps {
                 // Récupérer le code source depuis le dépôt Git
                 git branch: 'master', url: 'https://github.com/morndiaye2007/flask-school-management.git'
-                
-                
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Installer les dépendances Python
-                sh 'pip install -r requirements.txt'
-                // Installer pytest et pytest-flask pour les tests
-                sh 'pip install pytest pytest-flask'
+                // Utiliser bat au lieu de sh pour Windows
+                bat 'pip install -r requirements.txt'
+                // Installer pytest pour les tests
+                bat 'pip install pytest pytest-flask'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Exécuter les tests unitaires avec pytest
-                sh 'pytest --junitxml=test-results.xml'  // Générer un rapport JUnit pour Jenkins
-            }
-            post {
-                always {
-                    // Archiver les résultats des tests
-                    junit 'test-results.xml'
-                }
+                // Exécuter les tests avec pytest
+                bat 'pytest'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Déployer l'application Flask avec Gunicorn
-                sh 'gunicorn --bind 0.0.0.0:5000 run:app'
+                // Déployer l'application Flask
+                // Vous pouvez utiliser un script batch pour démarrer votre application
+                bat '''
+                    echo Déploiement de l\'application Flask
+                    set FLASK_APP=%FLASK_APP%
+                    set FLASK_ENV=%FLASK_ENV%
+                    set DATABASE_URL=%DATABASE_URL%
+                    
+                    REM Arrêter le service existant si nécessaire (à adapter selon votre configuration)
+                    REM taskkill /F /IM python.exe /FI "WINDOWTITLE eq Flask*" 2>NUL
+                    
+                    REM Démarrer l'application en arrière-plan
+                    start /B python -m flask run --host=0.0.0.0 --port=5000
+                    
+                    echo Application déployée avec succès
+                '''
             }
         }
     }
 
     post {
-        always {
-            // Nettoyer après la construction
-            cleanWs()
-        }
         success {
-            // Notifier en cas de succès
-            echo 'Build and deployment successful!'
+            echo 'Le déploiement a réussi !'
         }
         failure {
-            // Notifier en cas d'échec
-            echo 'Build or deployment failed!'
+            echo 'La construction ou le déploiement a échoué !'
+            // Nettoyage en cas d'échec
+            cleanWs()
         }
     }
 }
+
+
