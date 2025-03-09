@@ -62,8 +62,8 @@ pipeline {
 
     post {
         always {
-            // Nettoyer après la construction
-           // cleanWs()
+            //Ignorer l'étape de nettoyage en cas d'échec
+        cleanWs(deleteDirs: true, notFailBuild: true)
         }
         success {
             echo 'Le déploiement a réussi !'
