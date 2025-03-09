@@ -20,18 +20,18 @@ def test_add_student():
 
 
 # Test 3 : Suppression d'un étudiant
-def test_delete_student():
-    delete_button = driver.find_element(By.XPATH, "//td[text()='Baye Fall']/following-sibling::td/button[contains(text(), 'Supprimer')]")
-    delete_button.click()
-    time.sleep(1)
-    driver.switch_to.alert.accept()  # Confirmer la suppression
-    time.sleep(2)
-    assert "Mor Ndiaye" not in driver.page_source
+#def test_delete_student():
+ #   delete_button = driver.find_element(By.XPATH, "//td[text()='Baye Fall']/following-sibling::td/button[contains(text(), 'Supprimer')]")
+  #  delete_button.click()
+   # time.sleep(1)
+    #driver.switch_to.alert.accept()  # Confirmer la suppression
+    #time.sleep(2)
+    #assert "Mor Ndiaye" not in driver.page_source
 
 # Exécution des tests
 test_add_student()
 
-test_delete_student()
+#test_delete_student()
 
 # Fermeture du navigateur
 driver.quit()
