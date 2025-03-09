@@ -63,7 +63,7 @@ pipeline {
     post {
         always {
             // Nettoyer après la construction
-            cleanWs()
+           // cleanWs()
         }
         success {
             echo 'Le déploiement a réussi !'
