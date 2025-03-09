@@ -1,0 +1,238 @@
+<!-- templates/teachers.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Professeurs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="mb-4">Liste des Professeurs</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <form action="{{ url_for('get_teachers') }}" method="GET" class="row g-3">
+                    <div class="col-sm-6">
+                        <input type="text" name="q" class="form-control" placeholder="Rechercher par nom ou matière" value="{{ query or '' }}">
+                    </div>
+                    <div class="col-sm-4">
+                        <select name="department" class="form-select">
+                            <option value="">Tous les départements</option>
+                            <option value="Sciences" {% if department == 'Sciences' %}selected{% endif %}>Sciences</option>
+                            <option value="Lettres" {% if department == 'Lettres' %}selected{% endif %}>Lettres</option>
+                            <option value="Mathématiques" {% if department == 'Mathématiques' %}selected{% endif %}>Mathématiques</option>
+                            <option value="Langues" {% if department == 'Langues' %}selected{% endif %}>Langues</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('new_teacher') }}" class="btn btn-success">Ajouter un professeur</a>
+            </div>
+        </div>
+
+        {% if teachers %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Matière</th>
+                            <th>Email</th>
+                            <th>Département</th>
+                            <th>Date d'embauche</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                            <tr>
+                                <td>{{ teacher.id }}</td>
+                                <td>{{ teacher.name }}</td>
+                                <td>{{ teacher.subject }}</td>
+                                <td>{{ teacher.email or '-' }}</td>
+                                <td>{{ teacher.department or '-' }}</td>
+                                <td>{{ teacher.hire_date or '-' }}</td>
+                                <td>
+                                    <a href="{{ url_for('get_teacher', teacher_id=teacher.id) }}" class="btn btn-sm btn-info">Voir</a>
+                                    <a href="{{ url_for('edit_teacher', teacher_id=teacher.id) }}" class="btn btn-sm btn-warning">Modifier</a>
+                                    <form action="{{ url_for('delete_teacher', teacher_id=teacher.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce professeur?');">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">Aucun professeur trouvé.</div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<!-- templates/teachers/show.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Professeur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Détails du Professeur</h1>
+            <a href="{{ url_for('get_teachers') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">{{ teacher.name }}</h3>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <p><strong>ID:</strong> {{ teacher.id }}</p>
+                        <p><strong>Matière:</strong> {{ teacher.subject }}</p>
+                        <p><strong>Email:</strong> {{ teacher.email or 'Non spécifié' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Département:</strong> {{ teacher.department or 'Non spécifié' }}</p>
+                        <p><strong>Date d'embauche:</strong> {{ teacher.hire_date or 'Non spécifiée' }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('edit_teacher', teacher_id=teacher.id) }}" class="btn btn-warning">Modifier</a>
+                <form action="{{ url_for('delete_teacher', teacher_id=teacher.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce professeur?');">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<!-- templates/teachers/new.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Professeur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Ajouter un Professeur</h1>
+            <a href="{{ url_for('get_teachers') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ url_for('add_teacher') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom*</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Matière*</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Département</label>
+                        <select class="form-select" id="department" name="department">
+                            <option value="">Sélectionner un département</option>
+                            <option value="Sciences">Sciences</option>
+                            <option value="Lettres">Lettres</option>
+                            <option value="Mathématiques">Mathématiques</option>
+                            <option value="Langues">Langues</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hire_date" class="form-label">Date d'embauche</label>
+                        <input type="date" class="form-control" id="hire_date" name="hire_date">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<!-- templates/teachers/edit.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un Professeur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Modifier un Professeur</h1>
+            <a href="{{ url_for('get_teachers') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ url_for('update_teacher', teacher_id=teacher.id) }}" method="POST">
+                    <input type="hidden" name="_method" value="PUT">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom*</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ teacher.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Matière*</label>
+                        <input type="text" class="form-control" id="subject" name="subject" value="{{ teacher.subject }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ teacher.email or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Département</label>
+                        <select class="form-select" id="department" name="department">
+                            <option value="">Sélectionner un département</option>
+                            <option value="Sciences" {% if teacher.department == 'Sciences' %}selected{% endif %}>Sciences</option>
+                            <option value="Lettres" {% if teacher.department == 'Lettres' %}selected{% endif %}>Lettres</option>
+                            <option value="Mathématiques" {% if teacher.department == 'Mathématiques' %}selected{% endif %}>Mathématiques</option>
+                            <option value="Langues" {% if teacher.department == 'Langues' %}selected{% endif %}>Langues</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hire_date" class="form-label">Date d'embauche</label>
+                        <input type="date" class="form-control" id="hire_date" name="hire_date" value="{{ teacher.hire_date or '' }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

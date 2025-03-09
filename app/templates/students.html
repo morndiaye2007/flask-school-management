@@ -1,0 +1,180 @@
+{% extends "layout.html" %}
+
+{% block title %}Gestion des Étudiants{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Liste des Étudiants</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+            Ajouter un étudiant
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Âge</th>
+                        <th>Niveau</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.grade }}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-info" 
+                                    onclick="editStudent({{ student.id }}, '{{ student.name }}', '{{ student.age }}', '{{ student.grade }}')">
+                                Modifier
+                            </button>
+                            <button class="btn btn-sm btn-danger" 
+                                    onclick="deleteItem('/students', {{ student.id }}, '/students')">
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout d'étudiant -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStudentModalLabel">Ajouter un étudiant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="age" class="form-label">Âge</label>
+                        <input type="number" class="form-control" id="age" name="age" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="grade" class="form-label">Niveau</label>
+                        <input type="text" class="form-control" id="grade" name="grade" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitAddStudent">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de modification d'étudiant -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalLabel">Modifier un étudiant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm">
+                    <input type="hidden" id="edit_student_id">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_age" class="form-label">Âge</label>
+                        <input type="number" class="form-control" id="edit_age" name="age" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_grade" class="form-label">Niveau</label>
+                        <input type="text" class="form-control" id="edit_grade" name="grade" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitEditStudent">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Ajout d'un étudiant
+        $("#submitAddStudent").click(function() {
+            const formData = {
+                name: $("#name").val(),
+                age: $("#age").val(),
+                grade: $("#grade").val()
+            };
+            
+            $.ajax({
+                url: '/students',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function() {
+                    window.location.href = '/students';
+                },
+                error: function(xhr) {
+                    alert('Erreur: ' + xhr.responseText);
+                }
+            });
+        });
+        
+        // Modification d'un étudiant
+        $("#submitEditStudent").click(function() {
+            const studentId = $("#edit_student_id").val();
+            const formData = {
+                name: $("#edit_name").val(),
+                age: $("#edit_age").val(),
+                grade: $("#edit_grade").val()
+            };
+            
+            $.ajax({
+                url: '/students/' + studentId,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function() {
+                    window.location.href = '/students';
+                },
+                error: function(xhr) {
+                    alert('Erreur: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+    
+    // Fonction pour ouvrir le modal de modification avec les données de l'étudiant
+    function editStudent(id, name, age, grade) {
+        $("#edit_student_id").val(id);
+        $("#edit_name").val(name);
+        $("#edit_age").val(age);
+        $("#edit_grade").val(grade);
+        
+        const editModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+        editModal.show();
+    }
+</script>
+{% endblock %}
+
+{% endblock %}

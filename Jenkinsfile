@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Récupérer le code source depuis le dépôt Git
-                git branch: 'main', url: 'https://github.com/morndiaye2007/flask-school-management.git'
+                git branch: 'master', url: 'https://github.com/morndiaye2007/flask-school-management.git'
                 
                 
             }

@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}Gestion des Emplois du Temps{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Emplois du Temps</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
+            Ajouter un créneau
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cours</th>
+                        <th>Professeur</th>
+                        <th>Salle</th>
+                        <th>Horaire</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td>{{ schedule.id }}</td>
+                        <td>{{ course_names[schedule.course_id] }}</td>
+                        <td>{{ teacher_names[schedule.teacher_id] }}</td>
+                        <td>{{ classroom_names[schedule.classroom_id] }}</td>
+                        <td>{{ schedule.time }}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-info" 
+                                    onclick="editSchedule({{ schedule.id }}, {{ schedule.course_id }}, {{ schedule.teacher_id }}, {{ schedule.classroom_id }}, '{{ schedule.time }}')">
+                                Modifier
+                            </button>
+                            <button class="btn btn-sm btn-danger" 
+                                    onclick="deleteItem('/schedules', {{ schedule.id }}, '/schedules')">
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout d'emploi du temps -->
+<div class="modal fade" id="addScheduleModal" tabindex="-1" aria-labelledby="addScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addScheduleModalLabel">Ajouter un créneau</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addScheduleForm">
+                    <div class="mb-3">
+                        <label for="course_id" class="form-label">Cours</label>
+                        <select class="form-select" id="course_id" name="course_id" required>
+                            <option value="">Sélectionner un cours</option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="teacher_id" class="form-label">Professeur</label>
+                        <select class="form-select" id="teacher_id" name="teacher_id" required>
+                            <option value="">Sélectionner un professeur</option>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.name }} ({{ teacher.subject }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="classroom_id" class="form-label">Salle</label>
+                        <select class="form-select" id="classroom_id" name="classroom_id" required>
+                            <option value="">Sélectionner une salle</option>
+                            {% for classroom in classrooms %}
+                                <option value="{{ classroom.id }}">{{ classroom.name }} (Capacité: {{ classroom.capacity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="time" class="form-label">Horaire</label>
+                        <input type="text" class="form-control" id="time" name="time" placeholder="Ex: Lundi 10h-12h" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitAddSchedule">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de modification d'emploi du temps -->
+<div class="modal fade" id="editScheduleModal" tabindex="-1" aria-labelledby="editScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editScheduleModalLabel">Modifier un créneau</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editScheduleForm">
+                    <input type="hidden" id="edit_schedule_id">
+                    <div class="mb-3">
+                        <label for="edit_course_id" class="form-label">Cours</label>
+                        <select class="form-select" id="edit_course_id" name="course_id" required>
+                            <option value="">Sélectionner un cours</option>
+                            {% for course in courses %}
+                                <option value="{{

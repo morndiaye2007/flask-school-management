@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+
+{% block title %}Gestion des Cours{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Liste des Cours</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+            Ajouter un cours
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{ course.id }}</td>
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.description }}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-info" 
+                                    onclick="editCourse({{ course.id }}, '{{ course.name }}', '{{ course.description }}')">
+                                Modifier
+                            </button>
+                            <button class="btn btn-sm btn-danger" 
+                                    onclick="deleteItem('/courses', {{ course.id }}, '/courses')">
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout de cours -->
+<div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCourseModalLabel">Ajouter un cours</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCourseForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitAddCourse">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de modification de cours -->
+<div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCourseModalLabel">Modifier un cours</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCourseForm">
+                    <input type="hidden" id="edit_course_id">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitEditCourse">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Ajout d'un cours
+        $("#submitAddCourse").click(function() {
+            const formData = {
+                name: $("#name").val(),
+                description: $("#description").val()
+            };
+            
+            $.ajax({
+                url: '/courses',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function() {
+                    window.location.href = '/courses';
+                },
+                error: function(xhr) {
+                    alert('Erreur: ' + xhr.responseText);
+                }
+            });
+        });
+        
+        // Modification d'un cours
+        $("#submitEditCourse").click(function() {
+            const courseId = $("#edit_course_id").val();
+            const formData = {
+                name: $("#edit_name").val(),
+                description: $("#edit_description").val()
+            };
+            
+            $.ajax({
+                url: '/courses/' + courseId,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function() {
+                    window.location.href = '/courses';
+                },
+                error: function(xhr) {
+                    alert('Erreur: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+    
+    // Fonction pour ouvrir le modal de modification avec les données du cours
+    function editCourse(id, name, description) {
+        $("#edit_course_id").val(id);
+        $("#edit_name").val(name);
+        $("#edit_description").val(description);
+        
+        const editModal = new bootstrap.Modal(document.getElementById('editCourseModal'));
+        editModal.show();
+    }
+</script>
+{% endblock %}
+
+{% endblock %}
