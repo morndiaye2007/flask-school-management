@@ -1,0 +1,116 @@
+import unittest
+import json
+from app import create_app, db
+from app.models import Classroom
+
+class TestClassroomRoutes(unittest.TestCase):
+    def setUp(self):
+        # Créer une application de test avec une base de données en mémoire
+        self.app = create_app()
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app.config['TESTING'] = True
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        db.create_all()
+        
+        # Créer un client de test
+        self.client = self.app.test_client()
+        
+        # Ajouter quelques données de test
+        classroom1 = Classroom(name='Salle 101', capacity=30)
+        classroom2 = Classroom(name='Amphithéâtre A', capacity=150)
+        db.session.add_all([classroom1, classroom2])
+        db.session.commit()
+        
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+        
+    def test_get_classrooms(self):
+        # Tester la récupération de toutes les salles
+        response = self.client.get('/classrooms')
+        self.assertEqual(response.status_code, 200)
+        
+    def test_get_classroom(self):
+        # Tester la récupération d'une salle spécifique
+        classroom = Classroom.query.filter_by(name='Salle 101').first()
+        response = self.client.get(f'/classrooms/{classroom.id}')
+        self.assertEqual(response.status_code, 200)
+        
+        data = json.loads(response.data)
+        self.assertEqual(data['name'], 'Salle 101')
+        self.assertEqual(data['capacity'], 30)
+        
+    def test_add_classroom_json(self):
+        # Tester l'ajout d'une salle via JSON
+        new_classroom = {
+            'name': 'Laboratoire L1',
+            'capacity': 25
+        }
+        
+        response = self.client.post(
+            '/classrooms',
+            data=json.dumps(new_classroom),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 201)
+        
+        # Vérifier que la salle a été ajoutée en base
+        added_classroom = Classroom.query.filter_by(name='Laboratoire L1').first()
+        self.assertIsNotNone(added_classroom)
+        self.assertEqual(added_classroom.capacity, 25)
+        
+    def test_add_classroom_form(self):
+        # Tester l'ajout d'une salle via formulaire
+        new_classroom = {
+            'name': 'Salle informatique',
+            'capacity': 20
+        }
+        
+        response = self.client.post(
+            '/classrooms',
+            data=new_classroom
+        )
+        
+        # Redirection après création
+        self.assertEqual(response.status_code, 302)
+        
+        # Vérifier que la salle a été ajoutée en base
+        added_classroom = Classroom.query.filter_by(name='Salle informatique').first()
+        self.assertIsNotNone(added_classroom)
+        self.assertEqual(added_classroom.capacity, 20)
+        
+    def test_update_classroom(self):
+        # Tester la mise à jour d'une salle
+        classroom = Classroom.query.filter_by(name='Amphithéâtre A').first()
+        
+        updated_data = {
+            'name': 'Amphithéâtre A',
+            'capacity': 200
+        }
+        
+        response = self.client.put(
+            f'/classrooms/{classroom.id}',
+            data=json.dumps(updated_data),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Vérifier que la salle a été mise à jour
+        updated_classroom = Classroom.query.get(classroom.id)
+        self.assertEqual(updated_classroom.capacity, 200)
+        
+    def test_delete_classroom(self):
+        # Tester la suppression d'une salle
+        classroom = Classroom.query.filter_by(name='Salle 101').first()
+        
+        response = self.client.delete(f'/classrooms/{classroom.id}')
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Vérifier que la salle a été supprimée
+        deleted_classroom = Classroom.query.get(classroom.id)
+        self.assertIsNone(deleted_classroom)
