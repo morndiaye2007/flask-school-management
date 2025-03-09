@@ -17,7 +17,7 @@ class TestStudentRoutes(unittest.TestCase):
         self.client = self.app.test_client()
         
         # Ajouter quelques données de test
-        student1 = Student(name='Jean Dupont', age=18, grade='Terminale')
+        student1 = Student(name='Mor Mbaye', age=18, grade='Terminale')
         student2 = Student(name='Alice Martin', age=17, grade='Première')
         db.session.add_all([student1, student2])
         db.session.commit()
@@ -34,19 +34,19 @@ class TestStudentRoutes(unittest.TestCase):
         
     def test_get_student(self):
         # Tester la récupération d'un étudiant spécifique
-        student = Student.query.filter_by(name='Jean Dupont').first()
+        student = Student.query.filter_by(name='Mor Mbaye').first()
         response = self.client.get(f'/students/{student.id}')
         self.assertEqual(response.status_code, 200)
         
         data = json.loads(response.data)
-        self.assertEqual(data['name'], 'Jean Dupont')
+        self.assertEqual(data['name'], 'Mor Mbaye')
         self.assertEqual(data['age'], 18)
         self.assertEqual(data['grade'], 'Terminale')
         
     def test_add_student_json(self):
         # Tester l'ajout d'un étudiant via JSON
         new_student = {
-            'name': 'Paul Bernard',
+            'name': 'Demba Ndiaye',
             'age': 16,
             'grade': 'Seconde'
         }
@@ -60,7 +60,7 @@ class TestStudentRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         
         # Vérifier que l'étudiant a été ajouté en base
-        added_student = Student.query.filter_by(name='Paul Bernard').first()
+        added_student = Student.query.filter_by(name='Demba Ndiaye').first()
         self.assertIsNotNone(added_student)
         self.assertEqual(added_student.age, 16)
         self.assertEqual(added_student.grade, 'Seconde')
@@ -68,7 +68,7 @@ class TestStudentRoutes(unittest.TestCase):
     def test_add_student_form(self):
         # Tester l'ajout d'un étudiant via formulaire
         new_student = {
-            'name': 'Sophie Dubois',
+            'name': 'Abdoulaye Ly',
             'age': 15,
             'grade': 'Troisième'
         }
@@ -82,17 +82,17 @@ class TestStudentRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         
         # Vérifier que l'étudiant a été ajouté en base
-        added_student = Student.query.filter_by(name='Sophie Dubois').first()
+        added_student = Student.query.filter_by(name='Abdoulaye Ly').first()
         self.assertIsNotNone(added_student)
         self.assertEqual(added_student.age, 15)
         self.assertEqual(added_student.grade, 'Troisième')
         
     def test_update_student(self):
         # Tester la mise à jour d'un étudiant
-        student = Student.query.filter_by(name='Jean Dupont').first()
+        student = Student.query.filter_by(name='Moussa Diouf').first()
         
         updated_data = {
-            'name': 'Jean Dupont',
+            'name': 'Moussa Diouf',
             'age': 19,
             'grade': 'Licence'
         }
@@ -112,7 +112,7 @@ class TestStudentRoutes(unittest.TestCase):
         
     def test_delete_student(self):
         # Tester la suppression d'un étudiant
-        student = Student.query.filter_by(name='Alice Martin').first()
+        student = Student.query.filter_by(name='Abdou Faye').first()
         
         response = self.client.delete(f'/students/{student.id}')
         
