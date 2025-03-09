@@ -119,4 +119,126 @@
                         <select class="form-select" id="edit_course_id" name="course_id" required>
                             <option value="">Sélectionner un cours</option>
                             {% for course in courses %}
-                                <option value="{{
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_teacher_id" class="form-label">Professeur</label>
+                        <select class="form-select" id="edit_teacher_id" name="teacher_id" required>
+                            <option value="">Sélectionner un professeur</option>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.name }} ({{ teacher.subject }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_classroom_id" class="form-label">Salle</label>
+                        <select class="form-select" id="edit_classroom_id" name="classroom_id" required>
+                            <option value="">Sélectionner une salle</option>
+                            {% for classroom in classrooms %}
+                                <option value="{{ classroom.id }}">{{ classroom.name }} (Capacité: {{ classroom.capacity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_time" class="form-label">Horaire</label>
+                        <input type="text" class="form-control" id="edit_time" name="time" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitEditSchedule">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script pour la gestion des modales -->
+<script>
+function editSchedule(id, course_id, teacher_id, classroom_id, time) {
+    document.getElementById('edit_schedule_id').value = id;
+    document.getElementById('edit_course_id').value = course_id;
+    document.getElementById('edit_teacher_id').value = teacher_id;
+    document.getElementById('edit_classroom_id').value = classroom_id;
+    document.getElementById('edit_time').value = time;
+    
+    var editModal = new bootstrap.Modal(document.getElementById('editScheduleModal'));
+    editModal.show();
+}
+
+document.getElementById('submitAddSchedule').addEventListener('click', function() {
+    var form = document.getElementById('addScheduleForm');
+    if (form.checkValidity()) {
+        var formData = new FormData(form);
+        
+        fetch('/api/schedules', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Erreur lors de l\'ajout: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue lors de l\'ajout du créneau');
+        });
+    } else {
+        form.reportValidity();
+    }
+});
+
+document.getElementById('submitEditSchedule').addEventListener('click', function() {
+    var form = document.getElementById('editScheduleForm');
+    if (form.checkValidity()) {
+        var id = document.getElementById('edit_schedule_id').value;
+        var formData = new FormData(form);
+        
+        fetch('/api/schedules/' + id, {
+            method: 'PUT',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Erreur lors de la modification: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue lors de la modification du créneau');
+        });
+    } else {
+        form.reportValidity();
+    }
+});
+
+function deleteItem(endpoint, id, redirect) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+        fetch(endpoint + '/' + id, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = redirect;
+            } else {
+                alert('Erreur lors de la suppression: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue lors de la suppression');
+        });
+    }
+}
+</script>
+{% endblock %}
