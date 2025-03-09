@@ -95,8 +95,9 @@ pipeline {
 
     post {
         always {
-            // Nettoyer l'espace de travail
-            cleanWs(deleteDirs: true, notFailBuild: true)
+            node {
+                cleanWs(deleteDirs: true, notFailBuild: true)
+            }
         }
         success {
             echo 'Le déploiement a réussi !'
