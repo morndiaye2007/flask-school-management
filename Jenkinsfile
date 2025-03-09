@@ -1,65 +1,63 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.9-slim'  // Utilisation d'une image Python 3.9
-            args '-v /tmp:/tmp'      // Montage du volume /tmp pour le partage de fichiers
-            reuseNode true          // Réutiliser le nœud pour éviter de recréer un conteneur à chaque étape
-        }
-    }
+    agent any
 
     environment {
-        // Définir des variables d'environnement si nécessaire
-        PYTHONUNBUFFERED = '1'  // Pour éviter la mise en mémoire tampon de la sortie Python
+        // Définir les variables d'environnement nécessaires
+        DATABASE_URL = 'postgresql://postgres:passer@localhost:5433/gestion_ecole'
+        FLASK_APP = 'run.py'
+        FLASK_ENV = 'production'
     }
 
     stages {
         stage('Checkout') {
             steps {
+                // Récupérer le code source depuis le dépôt Git
                 git branch: 'master', url: 'https://github.com/morndiaye2007/flask-school-management.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install --upgrade pip'  // Mettre à jour pip
-                sh 'pip install -r requirements.txt'  // Installer les dépendances du projet
-                sh 'pip install pytest pytest-flask'  // Installer pytest et pytest-flask pour les tests
+                // Installer les dépendances Python avec pip
+                bat 'pip install -r requirements.txt'
+                // Installer pytest et pytest-flask pour les tests
+                bat 'pip install pytest pytest-flask'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest --junitxml=test-results.xml'  // Exécuter les tests et générer un rapport JUnit
+                // Exécuter les tests unitaires avec pytest
+                bat 'pytest --junitxml=test-results.xml'  // Générer un rapport JUnit pour Jenkins
             }
             post {
                 always {
-                    junit 'test-results.xml'  // Publier les résultats des tests même en cas d'échec
-                    archiveArtifacts artifacts: 'test-results.xml', allowEmptyArchive: true  // Archiver les résultats des tests
+                    // Archiver les résultats des tests
+                    junit 'test-results.xml'
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '''
-                    gunicorn --bind 0.0.0.0:5000 run:app &  // Démarrer Gunicorn en arrière-plan
-                    sleep 5  // Attendre que l'application démarre
-                '''
-            }
-            post {
-                success {
-                    echo 'Application déployée avec succès sur http://localhost:5000'
-                }
-                failure {
-                    echo 'Échec du déploiement de l\'application'
-                }
+                // Déployer l'application Flask avec Gunicorn (si Gunicorn est installé sur Windows)
+                bat 'gunicorn --bind 0.0.0.0:5000 run:app'
             }
         }
     }
 
     post {
         always {
-            cleanWs()  // Nettoyer l'espace de travail après l'exécution du pipeline
+            // Nettoyer après la construction
+            cleanWs()
+        }
+        success {
+            // Notifier en cas de succès
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            // Notifier en cas d'échec
+            echo 'Build or deployment failed!'
         }
     }
 }
