@@ -7,17 +7,17 @@ WORKDIR /app
 # Copier les fichiers de dépendances
 COPY requirements.txt .
 
-# Copier les fichiers du projet dans le conteneur
-COPY . .
-
 # Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier les fichiers du projet dans le conteneur
+COPY . .
 
 # Rendre le script exécutable
 RUN chmod +x entrypoint.sh
 
-# Exposer le port utilisé par Flask (5000)
-EXPOSE 5000
+# Exposer les ports utilisés par Flask (5000) et Prometheus (8000)
+EXPOSE 5000 8000
 
 # Utiliser le script comme point d'entrée
 ENTRYPOINT ["./entrypoint.sh"]

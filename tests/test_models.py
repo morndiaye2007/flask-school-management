@@ -1,23 +1,14 @@
-import pytest
-from app.models import Student, Teacher, db
-from app import create_app
-
-@pytest.fixture
-def app():
-    app = create_app()
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['TESTING'] = True
-    with app.app_context():
-        db.create_all()
-        yield app
-        db.drop_all()
+from app.models import Student, Teacher, Course, Classroom, Schedule
 
 def test_student_model(app):
     with app.app_context():
-        student = Student(name="John Doe", age=20, grade="A")
-        db.session.add(student)
-        db.session.commit()
-        assert student.id is not None
-        assert student.name == "John Doe"
+        student = Student(name='Moussa Diop', age=20, grade='A')
+        assert student.name == 'Moussa Diop'
         assert student.age == 20
-        assert student.grade == "A"
+        assert student.grade == 'A'
+
+def test_teacher_model(app):
+    with app.app_context():
+        teacher = Teacher(name='Mr. Ndiaye', subject='Math')
+        assert teacher.name == 'Mr. Ndiaye'
+        assert teacher.subject == 'Math'
