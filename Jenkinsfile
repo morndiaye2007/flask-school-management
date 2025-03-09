@@ -13,22 +13,24 @@ pipeline {
             steps {
                 // Récupérer le code source depuis le dépôt Git
                 git branch: 'master', url: 'https://github.com/morndiaye2007/flask-school-management.git'
+                
+                
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Installer les dépendances Python avec pip
-                bat 'pip install -r requirements.txt'
+                // Installer les dépendances Python
+                sh 'pip install -r requirements.txt'
                 // Installer pytest et pytest-flask pour les tests
-                bat 'pip install pytest pytest-flask'
+                sh 'pip install pytest pytest-flask'
             }
         }
 
         stage('Run Tests') {
             steps {
                 // Exécuter les tests unitaires avec pytest
-                bat 'pytest --junitxml=test-results.xml'  // Générer un rapport JUnit pour Jenkins
+                sh 'pytest --junitxml=test-results.xml'  // Générer un rapport JUnit pour Jenkins
             }
             post {
                 always {
@@ -40,8 +42,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Déployer l'application Flask avec Gunicorn (si Gunicorn est installé sur Windows)
-                bat 'gunicorn --bind 0.0.0.0:5000 run:app'
+                // Déployer l'application Flask avec Gunicorn
+                sh 'gunicorn --bind 0.0.0.0:5000 run:app'
             }
         }
     }
