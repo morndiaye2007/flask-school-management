@@ -43,10 +43,10 @@ pipeline {
             steps {
                 // Déployer l'application Flask
                 bat '''
-                    echo Déploiement de l'application Flask
-                    set FLASK_APP=%FLASK_APP%
-                    set FLASK_ENV=%FLASK_ENV%
-                    set DATABASE_URL=%DATABASE_URL%
+                    set FLASK_APP=run.py
+                    set FLASK_ENV=production
+                    set DATABASE_URL=postgresql://postgres:passer@localhost:5433/gestion_ecole
+
                     
                     REM Arrêter le service existant si nécessaire (à adapter selon votre configuration)
                     taskkill /F /IM python.exe /FI "WINDOWTITLE eq Flask*" 2>NUL
