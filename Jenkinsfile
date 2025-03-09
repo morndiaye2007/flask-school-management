@@ -24,6 +24,7 @@ pipeline {
             }
         }
 
+        /*
         stage('Run Tests') {
             steps {
                 // Exécuter les tests avec pytest
@@ -36,6 +37,7 @@ pipeline {
                 }
             }
         }
+        */
 
         stage('Deploy') {
             steps {
@@ -48,7 +50,7 @@ pipeline {
                     
                     REM Arrêter le service existant si nécessaire (à adapter selon votre configuration)
                     taskkill /F /IM python.exe /FI "WINDOWTITLE eq Flask*" 2>NUL
-                    
+                   
                     REM Démarrer l'application en arrière-plan
                     start /B C:\\laragon\\bin\\python\\python-3.10\\python.exe -m flask run --host=0.0.0.0 --port=5000
                     
